@@ -4,9 +4,11 @@ resource "kubernetes_service" "sampleappservice" {
   }
   spec {
     selector = {
-      app = "sampleApplication"
+      app = "sampleapplication"
     }
     session_affinity = "ClientIP"
+
+
     port {
       port        = 80
       target_port = 80

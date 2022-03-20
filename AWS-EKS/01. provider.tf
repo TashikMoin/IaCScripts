@@ -8,13 +8,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 3.0"
     }
-    mycloud = {
-      source  = "hashicorp/kubernetes"
-      version = "~> 1.13"
-    }
   }
 }
 
 provider "kubernetes" {
-  host = aws_eks_cluster.K8-cluster.endpoint
+  host                   = aws_eks_cluster.K8-cluster.endpoint
+  cluster_ca_certificate = base64decode(aws_eks_cluster.K8-cluster.certificate_authority[0].data)
 }

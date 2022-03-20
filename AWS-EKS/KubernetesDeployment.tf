@@ -2,7 +2,7 @@ resource "kubernetes_deployment" "sampleappdeployment" {
   metadata {
     name = "sampleappdeployment"
     labels = {
-      app = "sampleApplication"
+      app = "sampleapplication"
     }
   }
 
@@ -11,21 +11,21 @@ resource "kubernetes_deployment" "sampleappdeployment" {
 
     selector {
       match_labels = {
-        app = "sampleApplication"
+        app = "sampleapplication"
       }
     }
 
     template {
       metadata {
         labels = {
-          app = "sampleApplication"
+          app = "sampleapplication"
         }
       }
 
       spec {
         container {
           image = "tashikmoin/cicd-vps:latest"
-          name  = "sampleApplicationContainer"
+          name  = "sampleapplicationcontainer"
         }
       }
     }

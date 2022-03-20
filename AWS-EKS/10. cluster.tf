@@ -1,7 +1,6 @@
 resource "aws_eks_cluster" "K8-cluster" {
   name     = "K8-cluster"
   role_arn = aws_iam_role.resource-creation-role.arn
-  version  = "1.20.7"
   # desired kubernetes master version
 
   vpc_config {

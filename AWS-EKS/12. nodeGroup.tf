@@ -2,7 +2,7 @@ resource "aws_eks_node_group" "private-nodes" {
   cluster_name    = aws_eks_cluster.K8-cluster.name
   node_group_name = "private-nodes"
   node_role_arn   = aws_iam_role.nodeCreationRole.arn
-  version         = "1.20.7"
+  # version         = "1.21.5"
   # Kubernetes version on worker nodes, if not defined master nodes kubernetes version will be taken.
 
   # adding only private subnets here because we created public subnets for the load balancers 
