@@ -1,5 +1,5 @@
 resource "aws_eks_cluster" "K8-cluster" {
-  name     = "K8-cluster"
+  name     = var.cluster-name
   role_arn = aws_iam_role.resource-creation-role.arn
   # desired kubernetes master version
 

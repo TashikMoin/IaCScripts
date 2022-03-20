@@ -14,7 +14,9 @@ resource "aws_subnet" "first-private-subnet" {
     # this tag is important and MANDATORY to define because it will help kubernetes to discover those private subnets
     # in which it can do internal loadbalancing of services.
 
-    "kubernetes.io/cluster/eks" = "shared"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    # Key: kubernetes.io/cluster/yourEKSClusterName
+    # Value: shared
     # MANDATORY
   }
 }
@@ -31,7 +33,9 @@ resource "aws_subnet" "second-private-subnet" {
     # this tag is important and MANDATORY to define because it will help kubernetes to discover those private subnets
     # in which it can do internal loadbalancing of services.
 
-    "kubernetes.io/cluster/eks" = "shared"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    # Key: kubernetes.io/cluster/yourEKSClusterName
+    # Value: shared
     # MANDATORY
   }
 }
@@ -52,9 +56,12 @@ resource "aws_subnet" "first-public-subnet" {
     # a loadbalancer service, this tag will help the eks service to determine/discover available 
     # public subnets on which it can balance the load.
 
-    "kubernetes.io/cluster/eks" = "shared"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    # Key: kubernetes.io/cluster/yourEKSClusterName
+    # Value: shared
     # MANDATORY
-    # this tag will allow eks to discover and share services among available public subnets.
+    # this tag will allow eks to discover and share services like public load balancer among 
+    # available public subnets.
   }
 }
 
@@ -73,7 +80,9 @@ resource "aws_subnet" "second-public-subnet" {
     # a loadbalancer service, this tag will help the eks service to determine/discover available 
     # public subnets on which it can balance the load.
 
-    "kubernetes.io/cluster/eks" = "shared"
+    "kubernetes.io/cluster/${var.cluster-name}" = "shared"
+    # Key: kubernetes.io/cluster/yourEKSClusterName
+    # Value: shared
     # MANDATORY
     # this tag will allow eks to discover and share services among available public subnets.
   }
