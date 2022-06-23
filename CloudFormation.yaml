@@ -1,0 +1,170 @@
+Description: "CloudFormation Demo"
+Resources:
+  ChildLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Policies:
+        - PolicyName: PublisherLambdaPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - "arn:aws:logs:*:*:*"
+                Effect: Allow
+              - Action:
+                  - "sns:publish"
+                Resource: !Ref SNSEmailTopic
+                Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+    DependsOn:
+      - SNSEmailTopic
+  ParentLambda:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Role: !GetAtt ChildLambdaRole.Arn
+      Runtime: "python3.9"
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          import boto3
+
+          REGION = 'us-east-1'
+          TOPIC  = ''
+
+          def handler(event, context):
+            client = boto3.client('sns', region_name='us-east-1')
+            response = client.publish(
+            TopicArn=TOPIC,
+            Message=event['message']
+            )
+            print("Response: {}".format(response))
+  SNSEmailTopic:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      TopicName: "DevOps_Topic"
+      Subscription:
+        - Endpoint: !GetAtt ChildLambda.Arn
+          Protocol: "lambda"
+  ChildLambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Policies:
+        - PolicyName: SubscriberLambdaPolicy
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+                Resource:
+                  - "arn:aws:logs:*:*:*"
+                Effect: Allow
+              - Action:
+                  - "sns:subscribe"
+                Resource: "*"
+                Effect: Allow
+              - Action:
+                  - "ses:SendEmail"
+                  - "ses:SendRawEmail"
+                Resource: "*"
+                Effect: Allow
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+  ChildLambda:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      Role: !GetAtt ChildLambdaRole.Arn
+      Runtime: "python3.9"
+      Handler: index.handler
+      Code:
+        ZipFile: |
+          import boto3
+          from botocore.exceptions import ClientError
+
+          def send_email(recipientEmail):
+              SENDER = "tashikmoinsheikh@gmail.com"
+              RECIPIENT = recipientEmail 
+              AWS_REGION = "us-east-1"
+              SUBJECT = "DevOps"
+              BODY_TEXT = ("Hello World!\r\n")
+              
+              BODY_HTML = """<html>
+              <head></head>
+              <body>
+              <h1>Hello World !!!</h1>
+              <p>This email was sent with
+                  <a href='https://aws.amazon.com/ses/'>Amazon SES CQPOCS</a> using the
+                  <a href='https://aws.amazon.com/sdk-for-python/'>
+                  AWS SDK for Python (Boto)</a>.</p>
+              </body>
+              </html>
+                          """            
+
+              CHARSET = "UTF-8"
+
+              client = boto3.client('ses',region_name=AWS_REGION)
+
+              # Try to send the email.
+              try:
+                  #Provide the contents of the email.
+                  response = client.send_email(
+                      Destination={
+                          'ToAddresses': [
+                              RECIPIENT,
+                          ],
+                      },
+                      Message={
+                          'Body': {
+                              'Html': {
+                  
+                                  'Data': BODY_HTML
+                              },
+                              'Text': {
+                  
+                                  'Data': BODY_TEXT
+                              },
+                          },
+                          'Subject': {
+
+                              'Data': SUBJECT
+                          },
+                      },
+                      Source=SENDER
+                  )
+              # Display an error if something goes wrong.	
+              except ClientError as e:
+                  print(e.response['Error']['Message'])
+              else:
+                  print("Email has been sent!"),
+                  print(response['MessageId'])
+                  
+
+          def handler(event, context):
+            send_email(event['Records'][0]['Sns']['Message'])
+  LambdaInvokePermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:InvokeFunction"
+      Principal: "sns.amazonaws.com"
+      SourceArn: !Ref SNSEmailTopic
+      FunctionName: !GetAtt ChildLambda.Arn
