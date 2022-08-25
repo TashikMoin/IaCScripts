@@ -1,0 +1,9 @@
+locals {
+  ARM_SUBSCRIPTION_ID="56b988a3-eb59-4d5e-ad42-b22f73ee10f8"
+  ARM_CLIENT_ID="b57aa9cc-f4c8-45dd-936c-58410a58c32e"
+  ARM_CLIENT_SECRET="1mZ8Q~j5uEZh7BT5surYlte4hDZLKzE-hrFyzcT3"
+  ARM_TENANT_ID="ba629565-9419-4007-a10f-ec72243a319b"
+  RESOURCE_GROUP_NAME="terraform"
+  STORAGE_ACCOUNT_NAME="terraformidenfo"
+  CONTAINER_NAME="terraform-state"
+}
