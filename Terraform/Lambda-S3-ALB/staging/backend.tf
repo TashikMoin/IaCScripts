@@ -8,6 +8,7 @@ terraform {
    region         = "eu-west-1"
    encrypt        = true
    dynamodb_table = "dynamodb-state-table"
+   skip_credentials_validation = true
  }
 }
 
